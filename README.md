@@ -40,29 +40,15 @@ Be sure to note down the private IP addresses of your three Droplets. In this tu
 
 
 
+--------------------------------------------------------
 Install Ansible on Cluster Manager & MySQL server node
+--------------------------------------------------------
 
----------------------------------------------
 sudo apt-add-repository ppa:ansible/ansible
---------------------------------------------
 
-Press ENTER when prompted to accept the PPA addition.
-
-
-Next, refresh your system’s package index so that it is aware of the packages available in the newly included PPA:
-
--------------------
- sudo apt update
-------------------
-
-Following this update, you can install the Ansible software with:
-
----------------------------
- sudo apt install ansible
---------------------------
-
-Your Ansible control node now has all of the software required to administer your hosts. Next, we will go over how to add your hosts to the control node’s inventory file so that it can control them.
-
+sudo apt update
+ 
+sudo apt install ansible
 
 -------------------------------------
 Ansible Playbook for Mysql Cluster
