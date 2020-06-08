@@ -1,0 +1,40 @@
+- name: change the directory
+  shell: cd /home/ubuntu
+
+- name: Download binary file
+  get_url:
+    url:  https://dev.mysql.com/get/Downloads/MySQL-Cluster-7.6/mysql-cluster-community-data-node_7.6.6-1ubuntu18.04_amd64.deb
+    dest: /home/ubuntu/mysql-cluster-community-data-node_7.6.6-1ubuntu18.04_amd64.deb
+
+- name: update all packages
+  shell: apt update
+
+- name: install libclass-methodmaker-perl
+  shell: apt install libclass-methodmaker-perl
+
+- name: install data note binary
+  shell: dpkg -i mysql-cluster-community-data-node_7.6.6-1ubuntu18.04_amd64.deb
+
+- name: copy my.cnf file
+  template: 
+    src: my.cnf 
+    dest: /etc/my.cnf
+
+- name: Creates /usr/local/mysql/data directory
+  file:
+    path: /usr/local/mysql/data
+    state: directory
+
+- name: Install ndbd.service file
+  copy: 
+    src: ndbd.service
+    dest: /etc/systemd/system/ndbd.service
+
+- name: reload daemon
+  shell: systemctl daemon-reload
+
+- name: Initialize ndbd
+  service:
+    name: ndbd
+    state: started
+

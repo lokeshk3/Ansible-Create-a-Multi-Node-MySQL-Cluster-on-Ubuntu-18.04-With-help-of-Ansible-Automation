@@ -1,0 +1,67 @@
+#!/bin/bash
+# Linux Standard Base comments
+### BEGIN INIT INFO
+# Provides:          ndbd
+# Required-Start:    $local_fs $network $syslog $remote_fs
+# Required-Stop:     $local_fs $network $syslog $remote_fs
+# Should-Start:
+# Should-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: mysql cluster manager client
+# Description:       mysql cluster manager client
+### END INIT INFO
+ 
+ndbd_bin=/usr/local/bin/ndbd
+ 
+if ! test -x $ndbd_bin; then
+	echo "Can't execute $ndbd_bin";
+	exit;
+fi
+ 
+start_ndbd(){
+	number_of_ndbd_pids=`ps aux|grep -iv "grep"|grep -i "/usr/local/bin/ndbd"|wc -l`
+	if [ $number_of_ndbd_pids -eq 0 ]; then
+		$ndbd_bin
+		echo "ndbd started."
+	else
+		echo "ndbd is already running."
+	fi
+}
+ 
+stop_ndbd(){
+	number_of_ndbd_pids=`ps aux|grep -iv "grep"|grep -i "/usr/local/bin/ndbd"|wc -l`
+        if [ $number_of_ndbd_pids -ne 0 ]; then
+		ndbd_pids=`pgrep ndbd`
+        	for ndbd_pid in $(echo $ndbd_pids); do
+                	kill $ndbd_pid 2> /dev/null
+        	done
+ 
+		number_of_ndbd_pids=`ps aux|grep -iv "grep"|grep -i "/usr/local/bin/ndbd"|wc -l`
+ 
+        	if [ $number_of_ndbd_pids -eq 0 ]; then
+                	echo "ndbd stopped."
+        	else
+                	echo "Could not stop ndbd."
+        	fi
+	else
+		echo "ndbd is not running."
+	fi
+}
+ 
+ 
+case "$1" in
+    'start' )
+        start_ndbd
+        ;;
+    'stop' )
+	stop_ndbd
+        ;;
+    'restart' )
+        stop_ndbd
+	start_ndbd
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}" >&2
+        ;;
+esac

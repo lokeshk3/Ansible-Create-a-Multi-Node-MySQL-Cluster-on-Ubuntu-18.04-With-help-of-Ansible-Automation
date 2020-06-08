@@ -1,0 +1,21 @@
+- hosts: mysql_cluster_mgm
+  gather_facts: false
+  user: ubuntu
+  become: true
+  roles:
+  - mysql-cluster-mgm
+
+- hosts: mysql_cluster_data
+  gather_facts: false
+  user: ubuntu
+  become: true
+  roles:
+  - mysql-cluster-data
+
+- hosts: mysql_cluster_sql
+  gather_facts: false
+  user: ubuntu
+  become: true
+  roles:
+  - mysql-cluster-sql
+

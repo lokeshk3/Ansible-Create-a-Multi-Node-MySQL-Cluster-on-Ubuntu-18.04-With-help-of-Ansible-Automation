@@ -1,0 +1,31 @@
+- name: Install dependencies
+  apt: pkg=libaio1
+- name: Download binaries
+  command: wget --continue -P /var/tmp http://dev.mysql.com/get/Downloads/MySQL-Cluster-7.3/mysql-cluster-gpl-7.3.4-linux-glibc2.5-x86_64.tar.gz
+- name: Extract binaries
+  command: tar -C /usr/local -xzf /var/tmp/mysql-cluster-gpl-7.3.4-linux-glibc2.5-x86_64.tar.gz creates=/usr/local/mysql-cluster-gpl-7.3.4-linux-glibc2.5-x86_64
+- name: Link binary directory to short name
+  command: ln -s /usr/local/mysql-cluster-gpl-7.3.4-linux-glibc2.5-x86_64 /usr/local/mysql creates=/usr/local/mysql
+- name: Create mysql group
+  group: name=mysql system=yes
+- name: Create myslq user
+  user: name=mysql system=yes createhome=no group=mysql
+- name: Install mysql DB
+  command: ./scripts/mysql_install_db --user=mysql chdir=/usr/local/mysql/ creates=/usr/local/mysql/data/mysql/user.frm
+- name: Set permissions
+  shell: chown -R mysql /usr/local/mysql/data && chgrp -R mysql /usr/local/mysql/
+- name: Install init file
+  command: install /usr/local/mysql/support-files/mysql.server /etc/init.d/ creates=/etc/init.d/mysql.server
+- name: Install config
+  template: src=my.cnf dest=/etc/my.cnf
+- name: Activate init script and start mysql server
+  service: name=mysql.server enabled=yes state=started
+- name: Alter tables to allow user replication
+  command: /usr/local/mysql/bin/mysql -e 'ALTER TABLE mysql.{{ item }} ENGINE=NDBCLUSTER;' creates=/usr/local/mysql/data/mysql/{{ item }}.ndb
+  with_items:
+  - user
+  - db
+  - tables_priv
+  - columns_priv
+  - procs_priv
+  - proxies_priv
